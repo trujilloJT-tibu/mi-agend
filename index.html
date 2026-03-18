@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Core | Gestión Académica Cuádruple</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --utn: #003366; --esba: #1b5e20; --fadena: #b71c1c; --incuyo: #f57c00;
+            --dark-sidebar: #0f172a; --bg-main: #f8fafc;
+        }
+        body { background-color: var(--bg-main); font-family: 'Inter', sans-serif; }
+        .sidebar { background: var(--dark-sidebar); color: white; min-height: 100vh; padding: 1.5rem; position: sticky; top: 0; }
+        .nav-link { color: #94a3b8; border-radius: 8px; margin-bottom: 4px; transition: 0.2s; font-size: 0.85rem; display: flex; align-items: center; text-decoration: none; padding: 10px; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: white; transform: translateX(5px); }
+        .academic-card { border: none; border-radius: 12px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid #ccc; transition: 0.3s; margin-bottom: 1rem; }
+        .b-utn { border-top-color: var(--utn) !important; }
+        .b-esba { border-top-color: var(--esba) !important; }
+        .b-fadena { border-top-color: var(--fadena) !important; }
+        .b-incuyo { border-top-color: var(--incuyo) !important; }
+        .inst-tag { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; padding: 3px 12px; border-radius: 50px; color: white; }
+        .bg-utn { background: var(--utn); } .bg-esba { background: var(--esba); } 
+        .bg-fadena { background: var(--fadena); } .bg-incuyo { background: var(--incuyo); }
+        .fab { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; border-radius: 50%; z-index: 1000; }
+        @media (max-width: 992px) { .sidebar { display: none; } }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-lg-2 sidebar">
+            <h4 class="fw-bold text-white mb-4"><i class="fas fa-terminal me-2"></i>NEXUS CORE</h4>
+            <p class="small text-muted text-uppercase fw-bold">Campus Virtuales</p>
+            <div class="nav flex-column mb-4">
+                <a class="nav-link" href="https://frro.cvg.utn.edu.ar" target="_blank"><i class="fas fa-university me-2" style="color:var(--utn)"></i> UTN</a>
+                <a class="nav-link" href="https://iesba.campusinstituto.com.ar/my/courses.php" target="_blank"><i class="fas fa-shield-alt me-2" style="color:var(--esba)"></i> ESBA</a>
+                <a class="nav-link" href="https://campus.fadena.undef.edu.ar" target="_blank"><i class="fas fa-user-secret me-2" style="color:var(--fadena)"></i> FADENA</a>
+                <a class="nav-link" href="https://aula.incuyo.edu.ar/my" target="_blank"><i class="fas fa-code me-2" style="color:var(--incuyo)"></i> INCUYO</a>
+            </div>
+            <p class="small text-muted text-uppercase fw-bold">Inscripciones</p>
+            <div class="nav flex-column">
+                <a class="nav-link" href="https://alumnos.frro.utn.edu.ar/loginAlumno.asp?refrescar" target="_blank"><i class="fas fa-id-card-alt me-2"></i> SIU UTN</a>
+                <a class="nav-link" href="https://autogestion.fadena.undef.edu.ar/3w/inicio_alumno" target="_blank"><i class="fas fa-file-signature me-2"></i> Gestión FADENA</a>
+            </div>
+        </nav>
+        <main class="col-lg-10 p-4">
+            <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                <h2 class="fw-bold">Planificación Estratégica</h2>
+                <button class="btn btn-primary d-none d-md-block" data-bs-toggle="modal" data-bs-target="#modalAdd"><i class="fas fa-plus me-2"></i>Nueva Novedad</button>
+            </header>
+            <div class="row g-4">
+                <div class="col-xl-4 col-md-6">
+                    <h5 class="fw-bold text-danger mb-3">CRÍTICOS <span id="count-Examen" class="badge bg-danger ms-2">0</span></h5>
+                    <div id="container-Examen"></div>
+                </div>
+                <div class="col-xl-4 col-md-6">
+                    <h5 class="fw-bold text-primary mb-3">TAREAS & TPS <span id="count-Tarea" class="badge bg-primary ms-2">0</span></h5>
+                    <div id="container-Tarea"></div>
+                </div>
+                <div class="col-xl-4 col-md-12">
+                    <h5 class="fw-bold text-success mb-3">LECTURAS & LINKS <span id="count-Lectura" class="badge bg-success ms-2">0</span></h5>
+                    <div id="container-Lectura"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal Registro -->
+<div class="modal fade" id="modalAdd" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-body p-4">
+                <h5 class="fw-bold mb-3">Registrar Actividad</h5>
+                <select class="form-select mb-3" id="formInst">
+                    <option value="utn">UTN</option><option value="esba">ESBA</option>
+                    <option value="fadena">FADENA</option><option value="incuyo">INCUYO</option>
+                </select>
+                <input type="text" class="form-control mb-3" id="formMateria" placeholder="Materia">
+                <div class="row g-2 mb-3">
+                    <div class="col-6"><select class="form-select" id="formTipo">
+                        <option value="Examen">Examen</option><option value="Tarea">Tarea</option><option value="Lectura">Lectura</option>
+                    </select></div>
+                    <div class="col-6"><input type="datetime-local" class="form-control" id="formFecha"></div>
+                </div>
+                <input type="text" class="form-control mb-3" id="formTitulo" placeholder="Descripción">
+                <input type="url" class="form-control mb-3" id="formLink" placeholder="Link (Opcional)">
+                <button class="btn btn-primary w-100 py-2 fw-bold" onclick="registrar()">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-primary fab d-lg-none shadow-lg" data-bs-toggle="modal" data-bs-target="#modalAdd"><i class="fas fa-plus fa-lg"></i></button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let db = JSON.parse(localStorage.getItem('nexus_final_v1')) || [];
+    function registrar() {
+        const item = { id: Date.now(), inst: document.getElementById('formInst').value, materia: document.getElementById('formMateria').value, tipo: document.getElementById('formTipo').value, titulo: document.getElementById('formTitulo').value, fecha: document.getElementById('formFecha').value, link: document.getElementById('formLink').value, progreso: 0 };
+        db.push(item);
+        localStorage.setItem('nexus_final_v1', JSON.stringify(db));
+        bootstrap.Modal.getInstance(document.getElementById('modalAdd')).hide();
+        render();
+    }
+    function render() {
+        ['Examen', 'Tarea', 'Lectura'].forEach(t => {
+            const container = document.getElementById(`container-${t}`);
+            const items = db.filter(x => x.tipo === t).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+            document.getElementById(`count-${t}`).innerText = items.length;
+            container.innerHTML = '';
+            items.forEach(i => {
+                const card = document.createElement('div');
+                card.className = `academic-card b-${i.inst} p-3`;
+                card.innerHTML = `<div class="d-flex justify-content-between mb-2"><span class="inst-tag bg-${i.inst}">${i.inst}</span><button class="btn btn-sm p-0 text-muted" onclick="eliminar(${i.id})"><i class="fas fa-trash-alt"></i></button></div><h6 class="fw-bold mb-1">${i.materia}</h6><p class="small text-dark mb-2">${i.titulo}</p><div class="text-muted mb-2 small"><i class="far fa-calendar-alt me-1"></i> ${new Date(i.fecha).toLocaleString()}</div>${i.link ? `<a href="${i.link}" target="_blank" class="btn btn-sm btn-outline-dark w-100 py-1 mb-2" style="font-size:0.7rem;">Abrir Link</a>` : ''}${i.tipo === 'Lectura' ? `<div class="progress"><div class="progress-bar bg-success" style="width:${i.progreso}%"></div></div><div class="d-flex justify-content-between mt-1 text-muted small"><span onclick="updateP(${i.id},0)" style="cursor:pointer">0%</span><span onclick="updateP(${i.id},50)" style="cursor:pointer">50%</span><span onclick="updateP(${i.id},100)" style="cursor:pointer">100%</span></div>` : ''}`;
+                container.appendChild(card);
+            });
+        });
+    }
+    function updateP(id, v) { const idx = db.findIndex(x => x.id === id); db[idx].progreso = v; localStorage.setItem('nexus_final_v1', JSON.stringify(db)); render(); }
+    function eliminar(id) { if(confirm('¿Eliminar?')) { db = db.filter(x => x.id !== id); localStorage.setItem('nexus_final_v1', JSON.stringify(db)); render(); } }
+    render();
+</script>
+</body>
+</html>
