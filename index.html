@@ -3,126 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Core | Gestión Académica Cuádruple</title>
+    <title>ALMACEN TITO | Punto de Venta</title>
     <link rel="manifest" href="manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --utn: #003366; --esba: #1b5e20; --fadena: #b71c1c; --incuyo: #f57c00;
-            --dark-sidebar: #0f172a; --bg-main: #f8fafc;
-        }
-        body { background-color: var(--bg-main); font-family: 'Inter', sans-serif; }
-        .sidebar { background: var(--dark-sidebar); color: white; min-height: 100vh; padding: 1.5rem; position: sticky; top: 0; }
-        .nav-link { color: #94a3b8; border-radius: 8px; margin-bottom: 4px; transition: 0.2s; font-size: 0.85rem; display: flex; align-items: center; text-decoration: none; padding: 10px; }
-        .nav-link:hover { background: rgba(255,255,255,0.05); color: white; transform: translateX(5px); }
-        .academic-card { border: none; border-radius: 12px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 5px solid #ccc; transition: 0.3s; margin-bottom: 1rem; }
-        .b-utn { border-top-color: var(--utn) !important; }
-        .b-esba { border-top-color: var(--esba) !important; }
-        .b-fadena { border-top-color: var(--fadena) !important; }
-        .b-incuyo { border-top-color: var(--incuyo) !important; }
-        .inst-tag { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; padding: 3px 12px; border-radius: 50px; color: white; }
-        .bg-utn { background: var(--utn); } .bg-esba { background: var(--esba); } 
-        .bg-fadena { background: var(--fadena); } .bg-incuyo { background: var(--incuyo); }
-        .fab { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; border-radius: 50%; z-index: 1000; }
-        @media (max-width: 992px) { .sidebar { display: none; } }
+        :root { --tito-green: #2e7d32; --tito-orange: #f57c00; --tito-dark: #1a1a1a; --bg-light: #f0f2f5; }
+        body { background-color: var(--bg-light); font-family: 'Segoe UI', sans-serif; padding-bottom: 120px; }
+        .navbar { background-color: var(--tito-green) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .card { border: none; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 12px; }
+        .product-item { cursor: pointer; border-left: 6px solid var(--tito-green); background: white; transition: 0.2s; }
+        .product-item:active { transform: scale(0.95); background: #e8f5e9; }
+        .out-of-stock { border-left-color: #d32f2f; opacity: 0.5; pointer-events: none; }
+        .nav-pills .nav-link { color: #555; font-weight: 600; border-radius: 50px; }
+        .nav-pills .nav-link.active { background-color: var(--tito-green); }
+        
+        #detalleCarrito { max-height: 180px; overflow-y: auto; background: white; border-radius: 10px; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; }
+        .item-carrito { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 5px 0; }
+        
+        .total-banner { position: fixed; bottom: 0; left: 0; right: 0; background: var(--tito-dark); color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; }
+        .fiado-card { border-left: 6px solid #d32f2f; }
     </style>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="row">
-        <nav class="col-lg-2 sidebar">
-            <h4 class="fw-bold text-white mb-4"><i class="fas fa-terminal me-2"></i>NEXUS CORE</h4>
-            <p class="small text-muted text-uppercase fw-bold">Campus Virtuales</p>
-            <div class="nav flex-column mb-4">
-                <a class="nav-link" href="https://frro.cvg.utn.edu.ar" target="_blank"><i class="fas fa-university me-2" style="color:var(--utn)"></i> UTN</a>
-                <a class="nav-link" href="https://iesba.campusinstituto.com.ar/my/courses.php" target="_blank"><i class="fas fa-shield-alt me-2" style="color:var(--esba)"></i> ESBA</a>
-                <a class="nav-link" href="https://campus.fadena.undef.edu.ar" target="_blank"><i class="fas fa-user-secret me-2" style="color:var(--fadena)"></i> FADENA</a>
-                <a class="nav-link" href="https://aula.incuyo.edu.ar/my" target="_blank"><i class="fas fa-code me-2" style="color:var(--incuyo)"></i> INCUYO</a>
+
+<nav class="navbar navbar-dark sticky-top p-3">
+    <div class="container-fluid">
+        <span class="navbar-brand h1 fw-bold mb-0"><i class="fas fa-store me-2"></i>ALMACEN TITO</span>
+        <div>
+            <button class="btn btn-warning btn-sm fw-bold me-1" data-bs-toggle="modal" data-bs-target="#modalCaja"><i class="fas fa-cash-register"></i> CAJA</button>
+            <button class="btn btn-light btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalProducto"><i class="fas fa-plus"></i> STOCK</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-3">
+    <ul class="nav nav-pills nav-fill mb-3 bg-white p-2 rounded-pill shadow-sm">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-ventas">VENDER</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-stock">STOCK</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-fiados">FIADOS</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="tab-ventas">
+            <input type="text" id="searchVenta" class="form-control mb-3 shadow-sm" placeholder="Buscar producto..." onkeyup="filterVentas()">
+            <div id="listaVentas" class="row g-2 mb-4"></div>
+            
+            <h6 class="fw-bold"><i class="fas fa-shopping-basket me-2"></i>Ticket actual:</h6>
+            <div id="detalleCarrito" class="shadow-sm small">
+                <div class="text-muted text-center">Carrito vacío</div>
             </div>
-            <p class="small text-muted text-uppercase fw-bold">Inscripciones</p>
-            <div class="nav flex-column">
-                <a class="nav-link" href="https://alumnos.frro.utn.edu.ar/loginAlumno.asp?refrescar" target="_blank"><i class="fas fa-id-card-alt me-2"></i> SIU UTN</a>
-                <a class="nav-link" href="https://autogestion.fadena.undef.edu.ar/3w/inicio_alumno" target="_blank"><i class="fas fa-file-signature me-2"></i> Gestión FADENA</a>
-            </div>
-        </nav>
-        <main class="col-lg-10 p-4">
-            <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                <h2 class="fw-bold">Planificación Estratégica</h2>
-                <button class="btn btn-primary d-none d-md-block" data-bs-toggle="modal" data-bs-target="#modalAdd"><i class="fas fa-plus me-2"></i>Nueva Novedad</button>
-            </header>
-            <div class="row g-4">
-                <div class="col-xl-4 col-md-6">
-                    <h5 class="fw-bold text-danger mb-3">CRÍTICOS <span id="count-Examen" class="badge bg-danger ms-2">0</span></h5>
-                    <div id="container-Examen"></div>
-                </div>
-                <div class="col-xl-4 col-md-6">
-                    <h5 class="fw-bold text-primary mb-3">TAREAS & TPS <span id="count-Tarea" class="badge bg-primary ms-2">0</span></h5>
-                    <div id="container-Tarea"></div>
-                </div>
-                <div class="col-xl-4 col-md-12">
-                    <h5 class="fw-bold text-success mb-3">LECTURAS & LINKS <span id="count-Lectura" class="badge bg-success ms-2">0</span></h5>
-                    <div id="container-Lectura"></div>
-                </div>
-            </div>
-        </main>
+        </div>
+
+        <div class="tab-pane fade" id="tab-stock">
+            <div id="listaStock"></div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-fiados">
+            <button class="btn btn-danger w-100 mb-3 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#modalFiado">NUEVA DEUDA</button>
+            <div id="listaFiados"></div>
+        </div>
     </div>
 </div>
 
-<!-- Modal Registro -->
-<div class="modal fade" id="modalAdd" tabindex="-1">
+<div class="total-banner shadow-lg">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <small class="text-secondary d-block">TOTAL</small>
+            <h2 class="mb-0 fw-bold" id="cartTotal">$0</h2>
+        </div>
+        <button class="btn btn-success btn-lg px-4 fw-bold" onclick="prepararCobro()">COBRAR</button>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCaja" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-body p-4">
-                <h5 class="fw-bold mb-3">Registrar Actividad</h5>
-                <select class="form-select mb-3" id="formInst">
-                    <option value="utn">UTN</option><option value="esba">ESBA</option>
-                    <option value="fadena">FADENA</option><option value="incuyo">INCUYO</option>
-                </select>
-                <input type="text" class="form-control mb-3" id="formMateria" placeholder="Materia">
-                <div class="row g-2 mb-3">
-                    <div class="col-6"><select class="form-select" id="formTipo">
-                        <option value="Examen">Examen</option><option value="Tarea">Tarea</option><option value="Lectura">Lectura</option>
-                    </select></div>
-                    <div class="col-6"><input type="datetime-local" class="form-control" id="formFecha"></div>
+        <div class="modal-content border-0">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title fw-bold">Resumen de Caja</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div id="resumenCajaContent"></div>
+                <hr>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-danger" onclick="limpiarCaja()"><i class="fas fa-trash-alt me-2"></i>REINICIAR CAJA (BORRAR TODO)</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">CERRAR</button>
                 </div>
-                <input type="text" class="form-control mb-3" id="formTitulo" placeholder="Descripción">
-                <input type="url" class="form-control mb-3" id="formLink" placeholder="Link (Opcional)">
-                <button class="btn btn-primary w-100 py-2 fw-bold" onclick="registrar()">GUARDAR</button>
             </div>
         </div>
     </div>
 </div>
 
-<button class="btn btn-primary fab d-lg-none shadow-lg" data-bs-toggle="modal" data-bs-target="#modalAdd"><i class="fas fa-plus fa-lg"></i></button>
+<div class="modal fade" id="modalProducto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-body p-4">
+        <input type="hidden" id="prodId">
+        <label class="small fw-bold text-muted">NOMBRE</label><input type="text" id="prodNombre" class="form-control mb-2">
+        <label class="small fw-bold text-muted">PRECIO</label><input type="number" id="prodPrecio" class="form-control mb-2">
+        <label class="small fw-bold text-muted">STOCK</label>
+        <select id="prodEstado" class="form-select mb-3"><option value="true">SÍ HAY</option><option value="false">AGOTADO</option></select>
+        <button class="btn btn-success w-100 fw-bold" onclick="guardarProducto()">GUARDAR</button>
+    </div></div></div>
+</div>
+
+<div class="modal fade" id="modalCobro" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 text-center p-4">
+        <h2 class="fw-bold mb-4" id="cobroMonto"></h2>
+        <button class="btn btn-outline-primary mb-2 py-3 fw-bold" onclick="finalizarVenta('Efectivo')">EFECTIVO</button>
+        <button class="btn btn-outline-info py-3 fw-bold" onclick="finalizarVenta('Transferencia')">TRANSFERENCIA</button>
+    </div></div></div>
+</div>
+
+<div class="modal fade" id="modalFiado" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 p-4">
+            <h5 class="fw-bold">Anotar Deuda</h5>
+            <input type="text" id="fiadoCliente" class="form-control mb-2" placeholder="Cliente">
+            <input type="number" id="fiadoMonto" class="form-control mb-2" placeholder="Monto $">
+            <textarea id="fiadoNota" class="form-control mb-3" placeholder="Detalle"></textarea>
+            <button class="btn btn-danger w-100 fw-bold" onclick="guardarFiado()">ANOTAR EN LIBRETA</button>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    let db = JSON.parse(localStorage.getItem('nexus_final_v1')) || [];
-    function registrar() {
-        const item = { id: Date.now(), inst: document.getElementById('formInst').value, materia: document.getElementById('formMateria').value, tipo: document.getElementById('formTipo').value, titulo: document.getElementById('formTitulo').value, fecha: document.getElementById('formFecha').value, link: document.getElementById('formLink').value, progreso: 0 };
-        db.push(item);
-        localStorage.setItem('nexus_final_v1', JSON.stringify(db));
-        bootstrap.Modal.getInstance(document.getElementById('modalAdd')).hide();
-        render();
+    let productos = JSON.parse(localStorage.getItem('tito_stock')) || [];
+    let fiados = JSON.parse(localStorage.getItem('tito_fiados')) || [];
+    let ventasDia = JSON.parse(localStorage.getItem('tito_ventas_dia')) || [];
+    let carrito = [];
+
+    // --- PRODUCTOS ---
+    function guardarProducto() {
+        const id = document.getElementById('prodId').value;
+        const p = { id: id ? parseInt(id) : Date.now(), nombre: document.getElementById('prodNombre').value, precio: parseFloat(document.getElementById('prodPrecio').value) || 0, stock: document.getElementById('prodEstado').value === "true" };
+        if(id) { productos[productos.findIndex(x => x.id == id)] = p; } else { productos.push(p); }
+        localStorage.setItem('tito_stock', JSON.stringify(productos));
+        renderAll(); bootstrap.Modal.getInstance(document.getElementById('modalProducto')).hide();
+        document.getElementById('prodId').value = '';
     }
-    function render() {
-        ['Examen', 'Tarea', 'Lectura'].forEach(t => {
-            const container = document.getElementById(`container-${t}`);
-            const items = db.filter(x => x.tipo === t).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-            document.getElementById(`count-${t}`).innerText = items.length;
-            container.innerHTML = '';
-            items.forEach(i => {
-                const card = document.createElement('div');
-                card.className = `academic-card b-${i.inst} p-3`;
-                card.innerHTML = `<div class="d-flex justify-content-between mb-2"><span class="inst-tag bg-${i.inst}">${i.inst}</span><button class="btn btn-sm p-0 text-muted" onclick="eliminar(${i.id})"><i class="fas fa-trash-alt"></i></button></div><h6 class="fw-bold mb-1">${i.materia}</h6><p class="small text-dark mb-2">${i.titulo}</p><div class="text-muted mb-2 small"><i class="far fa-calendar-alt me-1"></i> ${new Date(i.fecha).toLocaleString()}</div>${i.link ? `<a href="${i.link}" target="_blank" class="btn btn-sm btn-outline-dark w-100 py-1 mb-2" style="font-size:0.7rem;">Abrir Link</a>` : ''}${i.tipo === 'Lectura' ? `<div class="progress"><div class="progress-bar bg-success" style="width:${i.progreso}%"></div></div><div class="d-flex justify-content-between mt-1 text-muted small"><span onclick="updateP(${i.id},0)" style="cursor:pointer">0%</span><span onclick="updateP(${i.id},50)" style="cursor:pointer">50%</span><span onclick="updateP(${i.id},100)" style="cursor:pointer">100%</span></div>` : ''}`;
-                container.appendChild(card);
-            });
+
+    // --- CARRITO ---
+    function agregarAlCarrito(id) {
+        const p = productos.find(x => x.id == id);
+        const index = carrito.findIndex(item => item.id === id);
+        if (index > -1) { carrito[index].cantidad += 1; } 
+        else { carrito.push({ ...p, cantidad: 1 }); }
+        actualizarCarritoUI();
+    }
+
+    function quitarDelCarrito(id) {
+        const index = carrito.findIndex(item => item.id === id);
+        if (index > -1) {
+            if (carrito[index].cantidad > 1) { carrito[index].cantidad -= 1; } 
+            else { carrito.splice(index, 1); }
+        }
+        actualizarCarritoUI();
+    }
+
+    function actualizarCarritoUI() {
+        const detalle = document.getElementById('detalleCarrito');
+        if (carrito.length === 0) {
+            detalle.innerHTML = '<div class="text-muted text-center">Carrito vacío</div>';
+            document.getElementById('cartTotal').innerText = "$0";
+            return;
+        }
+        let html = ''; let total = 0;
+        carrito.forEach(item => {
+            const subtotal = item.precio * item.cantidad;
+            total += subtotal;
+            html += `<div class="item-carrito"><span><b>${item.cantidad}x</b> ${item.nombre}</span><span>$${subtotal.toLocaleString()}<button class="btn btn-sm text-danger ms-2" onclick="quitarDelCarrito(${item.id})"><i class="fas fa-trash"></i></button></span></div>`;
         });
+        detalle.innerHTML = html;
+        document.getElementById('cartTotal').innerText = `$${total.toLocaleString()}`;
     }
-    function updateP(id, v) { const idx = db.findIndex(x => x.id === id); db[idx].progreso = v; localStorage.setItem('nexus_final_v1', JSON.stringify(db)); render(); }
-    function eliminar(id) { if(confirm('¿Eliminar?')) { db = db.filter(x => x.id !== id); localStorage.setItem('nexus_final_v1', JSON.stringify(db)); render(); } }
-    render();
+
+    // --- VENTAS Y CAJA ---
+    function finalizarVenta(metodo) {
+        const total = carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+        ventasDia.push({ monto: total, metodo: metodo, fecha: new Date().toLocaleDateString() });
+        localStorage.setItem('tito_ventas_dia', JSON.stringify(ventasDia));
+        carrito = []; actualizarCarritoUI();
+        bootstrap.Modal.getInstance(document.getElementById('modalCobro')).hide();
+        alert("Venta guardada!");
+    }
+
+    document.getElementById('modalCaja').addEventListener('show.bs.modal', function () {
+        const hoy = new Date().toLocaleDateString();
+        const deHoy = ventasDia.filter(v => v.fecha === hoy);
+        const efec = deHoy.filter(v => v.metodo === 'Efectivo').reduce((acc, v) => acc + v.monto, 0);
+        const trans = deHoy.filter(v => v.metodo === 'Transferencia').reduce((acc, v) => acc + v.monto, 0);
+        document.getElementById('resumenCajaContent').innerHTML = `
+            <h5 class="mb-3">${hoy}</h5>
+            <div class="d-flex justify-content-between mb-2"><span>💵 Efectivo:</span> <b>$${efec.toLocaleString()}</b></div>
+            <div class="d-flex justify-content-between mb-2"><span>💳 Transf:</span> <b>$${trans.toLocaleString()}</b></div>
+            <div class="d-flex justify-content-between h4 border-top pt-2 mt-2"><span>TOTAL:</span> <b>$${(efec+trans).toLocaleString()}</b></div>
+        `;
+    });
+
+    function limpiarCaja() {
+        if(confirm("¿Estás seguro de REINICIAR LA CAJA? Se borrarán todas las ventas del historial para empezar de cero.")){
+            ventasDia = [];
+            localStorage.setItem('tito_ventas_dia', JSON.stringify(ventasDia));
+            alert("Caja reiniciada.");
+            bootstrap.Modal.getInstance(document.getElementById('modalCaja')).hide();
+        }
+    }
+
+    function prepararCobro() { if(carrito.length === 0) return; document.getElementById('cobroMonto').innerText = `Total: $${carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0).toLocaleString()}`; new bootstrap.Modal(document.getElementById('modalCobro')).show(); }
+
+    // --- FIADOS ---
+    function guardarFiado() {
+        fiados.push({ id: Date.now(), cliente: document.getElementById('fiadoCliente').value, monto: document.getElementById('fiadoMonto').value, nota: document.getElementById('fiadoNota').value, fecha: new Date().toLocaleDateString() });
+        localStorage.setItem('tito_fiados', JSON.stringify(fiados));
+        renderAll(); bootstrap.Modal.getInstance(document.getElementById('modalFiado')).hide();
+    }
+    function borrarFiado(id) { if(confirm('¿Pagó la deuda?')) { fiados = fiados.filter(x => x.id != id); localStorage.setItem('tito_fiados', JSON.stringify(fiados)); renderAll(); } }
+
+    function renderAll() {
+        document.getElementById('listaStock').innerHTML = productos.sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(p => `<div class="card p-3 d-flex flex-row justify-content-between align-items-center"><div><b>${p.nombre}</b><br><span class="text-success">$${p.precio}</span></div><div><button class="btn btn-sm btn-outline-primary me-1" onclick="editarProd(${p.id})">Editar</button><button class="btn btn-sm btn-outline-danger" onclick="eliminarProd(${p.id})">X</button></div></div>`).join('');
+        document.getElementById('listaVentas').innerHTML = productos.map(p => `<div class="col-6 p-1"><div class="card p-3 product-item ${!p.stock?'out-of-stock':''}" onclick="agregarAlCarrito(${p.id})"><small class="text-truncate d-block">${p.nombre}</small><h5 class="fw-bold mb-0">$${p.precio}</h5></div></div>`).join('');
+        document.getElementById('listaFiados').innerHTML = fiados.map(f => `<div class="card p-3 fiado-card"><div class="d-flex justify-content-between"><b>${f.cliente}</b><b class="text-danger">$${f.monto}</b></div><small>${f.nota}</small><button class="btn btn-sm btn-success mt-2" onclick="borrarFiado(${f.id})">PAGÓ</button></div>`).join('');
+    }
+
+    function editarProd(id) { const p = productos.find(x => x.id == id); document.getElementById('prodId').value = p.id; document.getElementById('prodNombre').value = p.nombre; document.getElementById('prodPrecio').value = p.precio; document.getElementById('prodEstado').value = p.stock.toString(); new bootstrap.Modal(document.getElementById('modalProducto')).show(); }
+    function eliminarProd(id) { if(confirm('¿Borrar?')) { productos = productos.filter(x => x.id != id); localStorage.setItem('tito_stock', JSON.stringify(productos)); renderAll(); } }
+    function filterVentas() { let f = document.getElementById('searchVenta').value.toUpperCase(); let items = document.getElementById('listaVentas').getElementsByClassName('col-6'); for (let i = 0; i < items.length; i++) { items[i].style.display = items[i].innerText.toUpperCase().indexOf(f) > -1 ? "" : "none"; } }
+    renderAll();
 </script>
 </body>
 </html>
